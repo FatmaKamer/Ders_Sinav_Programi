@@ -1,0 +1,242 @@
+﻿@model Ders_Sinav_Programi.Models.DersEkleViewModel
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Ders Yönetimi</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark text-light border-secondary shadow-lg mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header border-secondary py-3" style="border-left: 5px solid var(--accent-red); background-color: rgba(255,255,255,0.02);">
+            <h5 class="mb-0 fw-bold">Yeni Ders Tanımla</h5>
+        </div>
+        <div class="card-body p-4">
+            <form id="dersForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">FAKÜLTE</label>
+                        <select id="ddlFakulte" class="form-select bg-dark text-light border-secondary" onchange="bolumleriYukle()">
+                            <option value="">Fakülte Seçiniz...</option>
+                            @foreach (var f in Model.Fakulteler)
+                            {
+                                <option value="@f.Id">@f.Ad</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">BÖLÜM</label>
+                        <select id="ddlBolum" class="form-select bg-dark text-light border-secondary" disabled onchange="dersleriListele()">
+                            <option value="">Önce Fakülte Seçiniz...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">AKADEMİK DÖNEM</label>
+                        <select id="ddlDonem" class="form-select bg-dark text-light border-secondary" onchange="dersleriListele()">
+                            <option value="">Dönem Seçiniz...</option>
+                            @foreach (var d in Model.Donemler)
+                            {
+                                <option value="@d.Id">@d.Yil-@(d.Yil+1) @d.Donem</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">SINIF DÜZEYİ</label>
+                        <select id="ddlSinif" class="form-select bg-dark text-light border-secondary" onchange="dersleriListele()">
+                            <option value="">Sınıf Seçiniz...</option>
+                            @foreach (var s in Model.Siniflar)
+                            {
+                                <option value="@s.Id">@s.Ad</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary small fw-bold">DERS KODU</label>
+                        <input type="text" id="txtDersKodu" class="form-control bg-dark text-light border-secondary" placeholder="Örn: SENG301">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">DERS ADI</label>
+                        <input type="text" id="txtDersAdi" class="form-control bg-dark text-light border-secondary" placeholder="Örn: Yazılım Mühendisliği">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary small fw-bold">ZORUNLULUK</label>
+                        <select id="ddlZorunluluk" class="form-select bg-dark text-light border-secondary">
+                            <option value="Zorunlu">Zorunlu</option>
+                            <option value="Seçmeli">Seçmeli</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">KREDİ</label>
+                        <input type="number" id="txtKredi" class="form-control bg-dark text-light border-secondary" placeholder="0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">HAFTALIK SAAT</label>
+                        <input type="number" id="txtSaat" class="form-control bg-dark text-light border-secondary" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-outline-light px-4" onclick="formuTemizle()">Temizle</button>
+                    <button type="button" class="btn btn-primary px-5" style="background-color: var(--accent-red); border: none;" onclick="dersEkle()">Ders Ekle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <h5 class="text-light fw-bold"><i class="bi bi-list-ul me-2"></i>Eklenen Dersler</h5>
+        </div>
+    </div>
+    <div class="table-container shadow-lg" style="background-color: transparent; border-radius: 12px; overflow: hidden; border: 1px solid #444;">
+        <div class="table-responsive">
+            <table class="table table-bordered border-secondary text-center align-middle m-0" style="background-color: #2a2424; color: #eee;">
+                <thead>
+                    <tr style="background-color: #333; color: white;">
+                        <th>Kod</th>
+                        <th>Ders Adı</th>
+                        <th>Sınıf</th>
+                        <th>Kredi</th>
+                        <th>Saat</th>
+                        <th>Tür</th>
+                        <th style="width: 100px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="dersTabloGövde">
+                    <tr>
+                        <td colspan="7" class="text-secondary py-4">Lütfen filtreleme yapın...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function bolumleriYukle() {
+            var fId = $("#ddlFakulte").val();
+            var ddlB = $("#ddlBolum");
+
+            if (fId) {
+                $.ajax({
+                    url: '/Yonetim/GetBolumler',
+                    type: 'GET',
+                    data: { fakulteId: fId },
+                    success: function (data) {
+                        ddlB.empty().append('<option value="">Bölüm Seçiniz...</option>');
+                        $.each(data, function (i, item) {
+                            ddlB.append('<option value="' + (item.id || item.Id) + '">' + (item.ad || item.Ad) + '</option>');
+                        });
+                        ddlB.prop('disabled', false);
+                        dersleriListele(); // Fakülte değişince listeyi de tazele
+                    }
+                });
+            } else {
+                ddlB.empty().append('<option value="">Önce Fakülte Seçiniz...</option>').prop('disabled', true);
+                $("#dersTabloGövde").html('<tr><td colspan="7" class="text-secondary py-4">Lütfen filtreleme yapın...</td></tr>');
+            }
+        }
+
+        // 2. FİLTRELERE GÖRE DERSLERİ TABLOYA DÖK
+        function dersleriListele() {
+            var bolumId = $("#ddlBolum").val();
+            var donemId = $("#ddlDonem").val();
+            var sinifId = $("#ddlSinif").val();
+
+            // Eğer temel filtreler seçiliyse listeleme yap
+            if (bolumId && donemId && sinifId) {
+                $.ajax({
+                    url: '/Yonetim/GetDersler',
+                    type: 'GET',
+                    data: { bolumId: bolumId, donemId: donemId, sinifId: sinifId },
+                    success: function (data) {
+                        var html = "";
+                        if (data.length > 0) {
+                            $.each(data, function (i, ders) {
+                                html += `<tr>
+                                    <td>${ders.dersKodu}</td>
+                                    <td class="text-start">${ders.dersAdi}</td>
+                                    <td>${ders.sinifAd}</td>
+                                    <td>${ders.kredi}</td>
+                                    <td>${ders.saat}</td>
+                                    <td><span class="badge ${ders.zorunlu === 'Zorunlu' ? 'bg-danger' : 'bg-info'}">${ders.zorunlu}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="dersSil(${ders.id})">
+                                            <i class="bi bi-trash"></i> Sil
+                                        </button>
+                                    </td>
+                                </tr>`;
+                            });
+                        } else {
+                            html = '<tr><td colspan="7" class="text-warning py-4">Bu kriterlere uygun ders bulunamadı.</td></tr>';
+                        }
+                        $("#dersTabloGövde").html(html);
+                    }
+                });
+            }
+        }
+
+        // 3. YENİ DERS EKLE
+        function dersEkle() {
+            var dersVerisi = {
+                DersKodu: $("#txtDersKodu").val(),
+                DersAdi: $("#txtDersAdi").val(),
+                BolumId: $("#ddlBolum").val(),
+                SinifId: $("#ddlSinif").val(),
+                DonemId: $("#ddlDonem").val(),
+                Kredi: $("#txtKredi").val(),
+                Saat: $("#txtSaat").val(),
+                Zorunlu: $("#ddlZorunluluk").val()
+            };
+
+            
+            if (!dersVerisi.DersKodu || !dersVerisi.DersAdi || !dersVerisi.BolumId) {
+                alert("Lütfen tüm alanları doldurun!");
+                return;
+            }
+
+            $.ajax({
+                url: '/Yonetim/DersKaydet',
+                type: 'POST',
+                data: { model: dersVerisi },
+                success: function (res) {
+                    if (res.success) {
+                        alert("Ders başarıyla eklendi!");
+                        dersleriListele(); // Listeyi güncelle
+                        // Formu kısmen temizle (Bölüm/Dönem kalsın ki ardı ardına ders eklenebilsin)
+                        $("#txtDersKodu, #txtDersAdi, #txtKredi, #txtSaat").val("");
+                    }
+                }
+            });
+        }
+
+        // 4. DERS SİL
+        function dersSil(id) {
+            if (confirm("Bu dersi silmek istediğinize emin misiniz?")) {
+                $.ajax({
+                    url: '/Yonetim/DersSil',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            dersleriListele();
+                        }
+                    }
+                });
+            }
+        }
+
+        function formuTemizle() {
+            document.getElementById("dersForm").reset();
+            $("#ddlBolum").prop('disabled', true);
+            $("#dersTabloGövde").html('<tr><td colspan="7" class="text-secondary py-4">Lütfen filtreleme yapın...</td></tr>');
+        }
+    </script>
+}

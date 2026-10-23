@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Akademik Program</title>
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo_ing.png" alt="Logo" style="width: 40px; margin-bottom: 10px;" /><br />
+                    Akademik Program <br/> Yönetim Sistemi
+                </a>
+            </div>
+
+            <p class="nav-section-title">GENEL</p>
+            <ul class="sidebar-nav">
+                <li>
+                    <a asp-controller="Musaitlik" asp-action="Index">
+                        <span>Müsaitlik Durumum</span>
+                    </a>
+                </li>
+            </ul>
+
+            
+            <p class="nav-section-title">YÖNETİM</p>
+            <ul class="sidebar-nav">
+                <li>
+    <a asp-controller="Yonetim" asp-action="DersEkle">
+        <span>Ders Ekle</span>
+    </a>
+</li>
+
+<li>
+    <a asp-controller="Yonetim" asp-action="SinavEkle">
+        <span>Sınav Ekle</span>
+    </a>
+</li>
+                <li>
+                    <a href="/KisitYonetimi/Index">
+                        <span>Kısıt Yönetimi</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Schedule" asp-action="Generate">
+                        <span>Program Oluştur</span>
+                    </a>
+                </li>
+            </ul>
+            
+            
+            <div style="position: absolute; bottom: 20px; left: 20px; color: var(--text-gray);">
+                <small>Hoş geldin,</small><br />
+                <strong>@User.Identity?.Name</strong>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @* Scriptler *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,127 @@
+﻿@model List<Ders_Sinav_Programi.Models.ZamanDilimiModel>
+
+@{
+    ViewData["Title"] = "Müsaitlik Durumum";
+}
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Müsaitlik Durumum</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert" style="background-color: #fdecea; border: 1px solid #f5c2c7; border-radius: 10px; padding: 20px; display: flex; align-items: flex-start; gap: 15px;">
+        <div style="color: #b52525; margin-top: 3px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
+            </svg>
+        </div>
+        <p style="color: #842029; margin-bottom: 0; font-size: 0.95rem;">
+            Haftalık programınızda <strong>müsait olmadığınız alanları işaretleyin</strong> ve Kaydet butonuna basın. İşaretlenmemiş saatler müsait olduğunuz zaman dilimleri olarak kaydedilecektir.
+        </p>
+    </div>
+
+    <div class="table-container mt-4" style="background-color: transparent; border-radius: 12px; overflow: hidden; border: 1px solid #444;">
+        <div class="table-responsive">
+            <table class="table table-bordered border-secondary text-center align-middle m-0" style="background-color: #2a2424; color: #eee;">
+                <thead>
+                    <tr style="background-color: var(--accent-red); color: white; border: none;">
+                        <th style="width: 180px; background-color: transparent;">Saat Aralıkları</th>
+                        <th style="background-color: transparent;">Pazartesi</th>
+                        <th style="background-color: transparent;">Salı</th>
+                        <th style="background-color: transparent;">Çarşamba</th>
+                        <th style="background-color: transparent;">Perşembe</th>
+                        <th style="background-color: transparent;">Cuma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        @foreach (var dilim in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold" style="background-color: rgba(255,255,255,0.05);">@dilim.SaatAraligi</td>
+                                @for (int j = 1; j <= 5; j++)
+                                {
+                                    <td class="availability-cell" 
+                                        onclick="toggleCell(this)" 
+                                        data-id="@dilim.Id"
+                                        style="cursor:pointer; height: 55px; border: 1px solid #444; transition: 0.2s;">
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4 pb-4">
+            <button class="btn btn-outline-light px-4" id="btnTemizle" onclick="temizleSecimleri()">Temizle</button>
+            <button class="btn btn-primary px-5" style="background-color: var(--accent-red); border: none;" onclick="kaydetMusaitlik()">Kaydet</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleCell(element) {
+            const redColor = "rgba(181, 37, 37, 0.7)";
+            if (element.style.backgroundColor === redColor) {
+                element.style.backgroundColor = "transparent";
+            } else {
+                element.style.backgroundColor = redColor;
+            }
+        }
+
+        function temizleSecimleri() {
+            const cells = document.querySelectorAll('.availability-cell');
+            cells.forEach(cell => {
+                cell.style.backgroundColor = "transparent";
+            });
+        }
+
+        function kaydetMusaitlik() {
+            let seciliAlanlar = [];
+            const cells = document.querySelectorAll('.availability-cell');
+            const headers = document.querySelectorAll('thead th');
+
+            cells.forEach(cell => {
+                if (cell.style.backgroundColor === "rgba(181, 37, 37, 0.7)") {
+                    const gunIndex = cell.cellIndex;
+                    const gunAdi = headers[gunIndex].innerText.trim();
+                    const zamanDilimiId = cell.getAttribute('data-id');
+
+                    seciliAlanlar.push({
+                        Gun: gunAdi,
+                        ZamanDilimiId: parseInt(zamanDilimiId)
+                    });
+                }
+            });
+
+            if (seciliAlanlar.length === 0) {
+                alert("Lütfen en az bir alan seçin.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Musaitlik/Kaydet',
+                type: 'POST',
+                data: { veriler: seciliAlanlar },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("Bir hata oluştu. Lütfen bağlantınızı ve giriş durumunuzu kontrol edin.");
+                }
+            });
+        }
+    </script>
+}

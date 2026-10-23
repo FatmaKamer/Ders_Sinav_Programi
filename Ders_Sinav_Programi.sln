@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37012.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ders_Sinav_Programi", "Ders_Sinav_Programi.csproj", "{A66299B5-16DC-48AD-9B1A-1BB74DC82A6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmTest", "..\AlgorithmTest\AlgorithmTest.csproj", "{CCB2F224-3511-48CE-A6B0-A2B07D4D3C2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A66299B5-16DC-48AD-9B1A-1BB74DC82A6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A66299B5-16DC-48AD-9B1A-1BB74DC82A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A66299B5-16DC-48AD-9B1A-1BB74DC82A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A66299B5-16DC-48AD-9B1A-1BB74DC82A6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCB2F224-3511-48CE-A6B0-A2B07D4D3C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCB2F224-3511-48CE-A6B0-A2B07D4D3C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCB2F224-3511-48CE-A6B0-A2B07D4D3C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCB2F224-3511-48CE-A6B0-A2B07D4D3C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {049F7B1F-A21E-44A8-BFCE-F96D698E63F0}
+	EndGlobalSection
+EndGlobal

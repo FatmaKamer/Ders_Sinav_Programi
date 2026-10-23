@@ -1,0 +1,276 @@
+﻿@model Ders_Sinav_Programi.Models.KisitYonetimiViewModel
+
+<div class="container-fluid p-4">
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Bölüm Kısıt Yönetimi</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark text-light border-secondary shadow-lg mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header border-secondary py-3" style="border-left: 5px solid var(--accent-red); background-color: rgba(255,255,255,0.02);">
+            <h5 class="mb-0 fw-bold">Bölüme Özel Kısıt Tanımla</h5>
+        </div>
+        <div class="card-body p-4">
+            <form id="kisitForm">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">FAKÜLTE</label>
+                        <select id="ddlFakulte" class="form-select bg-dark text-light border-secondary" onchange="bolumleriYukle()">
+                            <option value="">Fakülte Seçiniz...</option>
+                            @foreach (var f in Model.Fakulteler)
+                            {
+                                <option value="@f.Id">@f.Ad</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">BÖLÜM</label>
+                        <select id="ddlBolum" class="form-select bg-dark text-light border-secondary" disabled onchange="kisitlariListele()">
+                            <option value="">Önce Fakülte Seçiniz...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <hr class="border-secondary" />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label text-secondary small fw-bold">EKLENECEK KISIT (KATALOG)</label>
+                        <select id="ddlKisitKatalogu" class="form-select bg-dark text-light border-secondary" disabled onchange="kisitDetaylariniGetir()">
+                            <option value="">Kısıt Seçiniz...</option>
+                            @foreach (var k in Model.KisitKataloguListesi)
+                            {
+                                <option value="@k.Kisit_id" data-tip="@k.Kisit_Turu" data-paramtip="@k.Parametre_Tipi" data-puan="@k.Varsayilan_Puan">
+                                    [@k.Kategori.ToUpper()] @k.Aciklama (@k.Kisit_Turu)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Dinamik Veri Giriş Alanı (JS ile doldurulacak) -->
+                    <div class="col-md-6 mt-3" id="divDinamikParametre" style="display:none;">
+                        <label id="lblParametre" class="form-label text-warning small fw-bold">ÖZEL PARAMETRE DEĞERİ</label>
+                        <div id="parametreInputContainer">
+                            <!-- JS buraya input type="number" veya type="time" basacak -->
+                        </div>
+                    </div>
+
+                    <!-- Ceza Puanı Alanı (Sadece Soft kısıtlar için aktif olacak) -->
+                    <div class="col-md-6 mt-3" id="divCezaPuani" style="display:none;">
+                        <label class="form-label text-secondary small fw-bold">CEZA PUANI (AĞIRLIK)</label>
+                        <input type="number" id="txtCezaPuani" class="form-control bg-dark text-light border-secondary" placeholder="Örn: 50">
+                        <small class="text-muted">Kuralın algoritma için önem derecesi.</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-outline-light px-4" onclick="formuTemizle()">İptal</button>
+                    <button type="button" class="btn btn-primary px-5" style="background-color: var(--accent-red); border: none;" onclick="kisitEkle()">Kısıtı Bölüme Ekle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <h5 class="text-light fw-bold"><i class="bi bi-list-ul me-2"></i>Bölümün Aktif Kısıtları</h5>
+            <p class="text-muted small">Not: "Hard" ve sistem genel kısıtları tüm bölümler için zorunludur ve listeden silinemez.</p>
+        </div>
+    </div>
+
+    <div class="table-container shadow-lg" style="background-color: transparent; border-radius: 12px; overflow: hidden; border: 1px solid #444;">
+        <div class="table-responsive">
+            <table class="table table-bordered border-secondary text-center align-middle m-0" style="background-color: #2a2424; color: #eee;">
+                <thead>
+                    <tr style="background-color: #333; color: white;">
+                        <th>Kategori</th>
+                        <th>Kısıt Adı</th>
+                        <th>Tür</th>
+                        <th>Parametre / Değer</th>
+                        <th>Ceza Puanı</th>
+                        <th style="width: 100px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="kisitTabloGovde">
+                    <tr>
+                        <td colspan="6" class="text-secondary py-4">Lütfen yukarıdan bir bölüm seçin...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function bolumleriYukle() {
+            var fId = $("#ddlFakulte").val();
+            var ddlB = $("#ddlBolum");
+
+            if (fId) {
+                $.ajax({
+                    url: '/Yonetim/GetBolumler',
+                    type: 'GET',
+                    data: { fakulteId: fId },
+                    success: function (data) {
+                        ddlB.empty().append('<option value="">Bölüm Seçiniz...</option>');
+                        $.each(data, function (i, item) {
+                            ddlB.append('<option value="' + (item.id || item.Id) + '">' + (item.ad || item.Ad) + '</option>');
+                        });
+                        ddlB.prop('disabled', false);
+                        $("#ddlKisitKatalogu").prop('disabled', false);
+                        kisitlariListele();
+                    }
+                });
+            } else {
+                ddlB.empty().append('<option value="">Önce Fakülte Seçiniz...</option>').prop('disabled', true);
+                $("#ddlKisitKatalogu").prop('disabled', true);
+                $("#kisitTabloGovde").html('<tr><td colspan="6" class="text-secondary py-4">Lütfen bölüm seçin...</td></tr>');
+            }
+        }
+
+        function kisitDetaylariniGetir() {
+            var secilenOption = $("#ddlKisitKatalogu option:selected");
+            var kisitId = secilenOption.val();
+
+            if(!kisitId) {
+                $("#divDinamikParametre, #divCezaPuani").hide();
+                return;
+            }
+
+            var tip = secilenOption.data("tip");
+            var paramTip = secilenOption.data("paramtip");
+            var varsayilanPuan = secilenOption.data("puan");
+
+            $("#divCezaPuani").show();
+            if(tip === "Hard") {
+                $("#txtCezaPuani").val(10000).prop('disabled', true);
+            } else {
+                $("#txtCezaPuani").val(varsayilanPuan).prop('disabled', false);
+            }
+
+            var paramContainer = $("#parametreInputContainer");
+            paramContainer.empty();
+
+            if(paramTip === "int") {
+                $("#lblParametre").text("DEĞER (SAYI)");
+                paramContainer.append('<input type="number" id="txtParametre" class="form-control bg-dark text-light border-secondary" placeholder="Örn: 8">');
+                $("#divDinamikParametre").show();
+            }
+            else if(paramTip === "time") {
+                $("#lblParametre").text("ZAMAN ARALIĞI");
+                paramContainer.append('<div class="input-group">' +
+                    '<input type="time" id="txtTimeStart" class="form-control bg-dark text-light border-secondary">' +
+                    '<span class="input-group-text bg-dark text-light border-secondary">-</span>' +
+                    '<input type="time" id="txtTimeEnd" class="form-control bg-dark text-light border-secondary">' +
+                    '</div>');
+                $("#divDinamikParametre").show();
+            }
+            else {
+                $("#divDinamikParametre").hide();
+            }
+        }
+
+        function kisitlariListele() {
+            var bolumId = $("#ddlBolum").val();
+            if (!bolumId) return;
+
+            $.ajax({
+                url: '/KisitYonetimi/GetBolumKisitlari',
+                type: 'GET',
+                data: { bolumId: bolumId },
+                success: function (data) {
+                    var html = "";
+                    if (data.length > 0) {
+                        $.each(data, function (i, item) {
+                            var isHard = item.kisit_Turu === "Hard";
+                            var badgeClass = isHard ? "bg-danger" : "bg-warning text-dark";
+                            var isSystemKisit = item.id === 0;
+                            html += `<tr>
+                                <td><span class="badge bg-secondary">${item.kategori.toUpperCase()}</span></td>
+                                <td class="text-start">${item.kisit_Adi}</td>
+                                <td><span class="badge ${badgeClass}">${item.kisit_Turu}</span></td>
+                                <td>${item.parametre_Gosterim || '-'}</td>
+                                <td>${item.ceza_Puani}</td>
+                                <td>`;
+
+                            if (isSystemKisit) {
+                                html += `<span class="text-muted small"><i class="bi bi-lock-fill"></i> Sabit</span>`;
+                            } else {
+                                html += `<button class="btn btn-sm btn-outline-danger" onclick="kisitSil(${item.id})">
+                                            <i class="bi bi-trash"></i> Sil
+                                         </button>`;
+                            }
+                            html += `</td></tr>`;
+                        });
+                    } else {
+                        html = '<tr><td colspan="6" class="text-warning py-4">Bu bölüme henüz özel kısıt eklenmemiş. Sistem genel kısıtları geçerlidir.</td></tr>';
+                    }
+                    $("#kisitTabloGovde").html(html);
+                }
+            });
+        }
+
+        function kisitEkle() {
+            var paramTip = $("#ddlKisitKatalogu option:selected").data("paramtip");
+            var jsonParam = null;
+
+            if (paramTip === "int") {
+                jsonParam = JSON.stringify({ "deger": $("#txtParametre").val() });
+            } else if (paramTip === "time") {
+                jsonParam = JSON.stringify({
+                    "baslangic": $("#txtTimeStart").val(),
+                    "bitis": $("#txtTimeEnd").val()
+                });
+            }
+
+            var veri = {
+                Bolum_id: $("#ddlBolum").val(),
+                Kisit_id: $("#ddlKisitKatalogu").val(),
+                Ceza_Puani: $("#txtCezaPuani").val(),
+                Parametre_Degeri: jsonParam
+            };
+
+            if (!veri.Bolum_id || !veri.Kisit_id) {
+                alert("Lütfen Bölüm ve Kısıt seçiniz.");
+                return;
+            }
+
+            $.ajax({
+                url: '/KisitYonetimi/KisitEkle',
+                type: 'POST',
+                data: { model: veri },
+                success: function (res) {
+                    if (res.success) {
+                        kisitlariListele();
+                        $("#ddlKisitKatalogu").val("");
+                        $("#divDinamikParametre, #divCezaPuani").hide();
+                    } else {
+                        alert(res.message || "Bir hata oluştu.");
+                    }
+                }
+            });
+        }
+
+        function kisitSil(id) {
+            if (confirm("Bu kısıtı kaldırmak istediğinize emin misiniz? (Sistem varsayılan ayarlarına dönülecektir)")) {
+                $.ajax({
+                    url: '/KisitYonetimi/KisitSil',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            kisitlariListele();
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

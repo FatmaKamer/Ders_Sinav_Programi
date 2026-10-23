@@ -1,0 +1,228 @@
+﻿@model Ders_Sinav_Programi.Models.SinavEkleViewModel
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Sınav Yönetimi</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark text-light border-secondary shadow-lg mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header border-secondary py-3" style="border-left: 5px solid var(--accent-red); background-color: rgba(255,255,255,0.02);">
+            <h5 class="mb-0 fw-bold">Yeni Sınav Tanımla</h5>
+        </div>
+        <div class="card-body p-4">
+            <form id="sinavForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-secondary">FAKÜLTE</label>
+                        <select id="ddlFakulte" class="form-select bg-dark text-light border-secondary" onchange="bolumleriYukle()">
+                            <option value="">Fakülte Seçiniz...</option>
+                            @foreach (var f in Model.Fakulteler) { <option value="@f.Id">@f.Ad</option> }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-secondary">BÖLÜM</label>
+                        <select id="ddlBolum" class="form-select bg-dark text-light border-secondary" disabled onchange="dersleriYukle()">
+                            <option value="">Bölüm Seçiniz...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-secondary">DÖNEM</label>
+                        <select id="ddlDonem" class="form-select bg-dark text-light border-secondary" onchange="dersleriYukle()">
+                            @foreach (var d in Model.Donemler) { <option value="@d.Id">@d.Yil-@(d.Yil+1) @d.Donem</option> }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-secondary">SINIF</label>
+                        <select id="ddlSinif" class="form-select bg-dark text-light border-secondary" onchange="dersleriYukle()">
+                            @foreach (var s in Model.Siniflar) { <option value="@s.Id">@s.Ad</option> }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-secondary">DERS SEÇİN</label>
+                        <select id="ddlDers" class="form-select bg-dark text-light border-secondary" disabled>
+                            <option value="">Kriterlere Uygun Ders Seçin...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-secondary">SINAV TİPİ</label>
+                        <select id="ddlSinavTipi" class="form-select bg-dark text-light border-secondary">
+                            @foreach (var t in Model.SinavTipleri) { <option value="@t.Id">@t.Ad</option> }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-secondary">SÜRE (DAKİKA)</label>
+                        <input type="number" id="txtSure" class="form-control bg-dark text-light border-secondary" placeholder="Örn: 60">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-outline-light px-4" onclick="formuTemizle()">Temizle</button>
+                    <button type="button" class="btn btn-primary px-5" style="background-color: var(--accent-red); border: none;" onclick="sinavEkle()">Sınav Ekle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <h5 class="text-light fw-bold"><i class="bi bi-calendar2-check me-2"></i>Eklenen Sınavlar</h5>
+        </div>
+    </div>
+    <div class="table-container shadow-lg" style="border-radius: 12px; overflow: hidden; border: 1px solid #444;">
+        <div class="table-responsive">
+            <table class="table table-bordered border-secondary text-center align-middle m-0" style="background-color: #2a2424; color: #eee;">
+                <thead>
+                    <tr style="background-color: #333; color: white;">
+                        <th>Ders Adı</th>
+                        <th>Sınav Tipi</th>
+                        <th>Süre (Dk)</th>
+                        <th style="width: 100px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="sinavTabloGövde">
+                    <tr>
+                        <td colspan="4" class="text-secondary py-4">Lütfen filtreleme yapın...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 
+@section Scripts {
+    <script>
+        
+        function bolumleriYukle() {
+    var fId = $("#ddlFakulte").val();
+    var ddlB = $("#ddlBolum");
+    var ddlDers = $("#ddlDers");
+
+    if (fId) {
+        $.ajax({
+            url: '/Yonetim/GetBolumler',
+            type: 'GET',
+            data: { fakulteId: fId },
+            success: function (data) {
+                ddlB.empty().append('<option value="">Bölüm Seçiniz...</option>');
+                $.each(data, function (i, item) {
+                    
+                    ddlB.append('<option value="' + (item.id || item.Id || item.bolum_id) + '">' + (item.ad || item.Ad || item.bolum_adi) + '</option>');
+                });
+                ddlB.prop('disabled', false);
+                dersleriYukle();
+                
+                
+                ddlDers.empty().append('<option value="">Önce Bölüm Seçiniz...</option>').prop('disabled', true);
+                $("#sinavTabloGövde").html('<tr><td colspan="4" class="text-secondary py-4">Lütfen filtreleme yapın...</td></tr>');
+            }
+        });
+    } else {
+        ddlB.empty().append('<option value="">Önce Fakülte Seçiniz...</option>').prop('disabled', true);
+    }
+}
+
+        
+        function dersleriYukle() {
+            var bId = $("#ddlBolum").val();
+            var dId = $("#ddlDonem").val();
+            var sId = $("#ddlSinif").val();
+            var ddlDers = $("#ddlDers");
+
+            if (bId && dId && sId) {
+                $.ajax({
+                    url: '/Yonetim/GetDerslerByFilter',
+                    type: 'GET',
+                    data: { bolumId: bId, donemId: dId, sinifId: sId },
+                    success: function (data) {
+                        ddlDers.empty().append('<option value="">Ders Seçiniz...</option>');
+                        $.each(data, function (i, item) {
+                            ddlDers.append('<option value="' + (item.id || item.Id) + '">' + (item.ad || item.Ad) + '</option>');
+                        });
+                        ddlDers.prop('disabled', false);
+                        sinavlariListele();
+                    }
+                });
+            }
+        }
+
+        
+        function sinavEkle() {
+            var model = {
+                DersId: $("#ddlDers").val(),
+                SinavTipiId: $("#ddlSinavTipi").val(),
+                Sure: $("#txtSure").val(),
+                DonemId: $("#ddlDonem").val()
+            };
+
+            if (!model.DersId || !model.Sure) {
+                alert("Lütfen ders seçin ve süreyi girin!");
+                return;
+            }
+
+            $.ajax({
+                url: '/Yonetim/SinavKaydet',
+                type: 'POST',
+                data: { model: model },
+                success: function (res) {
+                    if (res.success) {
+                        alert("Sınav eklendi!");
+                        sinavlariListele();
+                    } else {
+                        alert("Hata: " + res.message);
+                    }
+                }
+            });
+        }
+
+        
+        function sinavlariListele() {
+            var bId = $("#ddlBolum").val();
+            var dId = $("#ddlDonem").val();
+            var sId = $("#ddlSinif").val();
+
+            $.ajax({
+                url: '/Yonetim/GetSinavlar',
+                type: 'GET',
+                data: { bolumId: bId, donemId: dId, sinifId: sId },
+                success: function (data) {
+                    var html = "";
+                    $.each(data, function (i, s) {
+                        html += `<tr>
+                            <td class="text-start">${s.dersAdi}</td>
+                            <td>${s.sinavTipi}</td>
+                            <td>${s.sure}</td>
+                            <td><button class="btn btn-sm btn-outline-danger" onclick="sinavSil(${s.id})">Sil</button></td>
+                        </tr>`;
+                    });
+                    $("#sinavTabloGövde").html(html || '<tr><td colspan="4">Kayıt bulunamadı.</td></tr>');
+                }
+            });
+        }
+
+        function sinavSil(id) {
+    if (confirm("Bu sınavı silmek istediğinize emin misiniz?")) {
+        $.ajax({
+            url: '/Yonetim/SinavSil',
+            type: 'POST',
+            data: { id: id },
+            success: function (res) {
+                if (res.success) { sinavlariListele(); }
+            }
+        });
+    }
+}
+
+        function formuTemizle() {
+            document.getElementById("sinavForm").reset();
+            $("#ddlBolum, #ddlDers").prop('disabled', true);
+        }
+    </script>
+}

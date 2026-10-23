@@ -1,0 +1,65 @@
+﻿@model Ders_Sinav_Programi.Algorithm.Solution.ScheduleSolution
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Otomatik Ders Programı Oluştur</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark text-light border-secondary shadow-lg mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-header border-secondary py-3" style="border-left: 5px solid var(--accent-red); background-color: rgba(255,255,255,0.02);">
+            <h5 class="mb-0 fw-bold">Program Oluşturma Paneli</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Generate" asp-controller="Schedule" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">BÖLÜM SEÇİN</label>
+                        <select name="bolumId" class="form-select bg-dark text-light border-secondary">
+                            <!-- Test için Bölüm ID'leri sabit yazıldı, ileride ViewBag ile çekeceğiz -->
+                            <option value="1">Bilgisayar Mühendisliği</option>
+                            <option value="2">Yazılım Mühendisliği</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary small fw-bold">DÖNEM SEÇİN</label>
+                        <select name="donemId" class="form-select bg-dark text-light border-secondary">
+                            <option value="1">2025-2026 Güz</option>
+                            <option value="2">2025-2026 Bahar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary px-5 py-3" style="background-color: var(--accent-red); border: none; font-weight: bold;">
+                        <i class="bi bi-cpu me-2"></i> Algoritmayı Çalıştır ve Programı Oluştur
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sonuç Kısmı -->
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-warning shadow-lg">@ViewBag.Message</div>
+    }
+
+    @if (ViewBag.Hard != null)
+    {
+        <div class="card bg-dark text-light border-secondary shadow-lg" style="border-radius: 12px;">
+            <div class="card-header border-secondary py-3">
+                <h5 class="mb-0 fw-bold text-success">Program Başarıyla Oluşturuldu!</h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="display-4 text-success fw-bold">Hard: @ViewBag.Hard</h1>
+                <p class="fs-4 text-muted">Yumuşak Maliyet (Soft): @ViewBag.Soft</p>
+                <a asp-controller="Schedule" asp-action="ViewSchedule" asp-route-bolumId="@ViewBag.BolumId" asp-route-donemId="@ViewBag.DonemId" class="btn btn-outline-light mt-3">Programı Görüntüle</a>
+            </div>
+        </div>
+    }
+</div>

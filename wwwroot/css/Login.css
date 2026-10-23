@@ -1,0 +1,269 @@
+﻿
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #b52525;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-card {
+    background: #fff;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.card-top {
+    background: #b52525;
+    padding: 26px 20px 22px;
+    text-align: center;
+}
+
+.logo-circle {
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.school-logo {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 0;
+}
+
+.school-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.40);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 4px 18px;
+    border-radius: 20px;
+}
+
+.card-body {
+    padding: 24px 22px 28px;
+    background: #fafafa;
+}
+
+.login-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bbb;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 38px 10px 34px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 13px;
+    color: #222;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+
+}
+
+    .form-input::-ms-reveal,
+    .form-input::-ms-clear {
+        display: none;
+    }
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+}
+
+    .form-input::placeholder {
+        color: #bbb;
+    }
+
+    .form-input:focus {
+        border-color: #b52525;
+    }
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+    .toggle-password:hover {
+        color: #b52525;
+    }
+
+    .toggle-password svg {
+        width: 15px;
+        height: 15px;
+    }
+
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 6px 0 18px;
+}
+
+.remember-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+}
+
+    .remember-label input[type="checkbox"] {
+        display: none;
+    }
+
+.custom-checkbox {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid #b52525;
+    background: #fff;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+    position: relative;
+    transition: background-color 0.15s;
+}
+
+.remember-label input[type="checkbox"]:checked + .custom-checkbox {
+    background-color: #b52525;
+}
+
+    .remember-label input[type="checkbox"]:checked + .custom-checkbox::after {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: 0px;
+        width: 5px;
+        height: 8px;
+        border: 2px solid #fff;
+        border-top: none;
+        border-left: none;
+        transform: rotate(45deg);
+    }
+
+.forgot-link {
+    font-size: 12px;
+    color: #b52525;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+    .forgot-link:hover {
+        color: #8a1c1c;
+        text-decoration: underline;
+    }
+
+.error-banner {
+    background: #fdecea;
+    border-left: 3px solid #b52525;
+    color: #7a1a1a;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+}
+
+.validation-msg {
+    display: block;
+    font-size: 11px;
+    color: #b52525;
+    margin-top: 4px;
+    padding-left: 4px;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 11px;
+    background: #b52525;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    /*box-shadow: 0 4px 14px rgba(181, 37, 37, 0.40);*/
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+    .btn-login:hover {
+        background: #9a1e1e;
+    }
+
+    .btn-login:active {
+        transform: scale(0.99);
+    }
+
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 20px 16px 24px;
+    }
+}

@@ -1,0 +1,138 @@
+﻿
+:root {
+    --sidebar-bg: #1a0505;
+    --main-bg: #1f1a1a;
+    --card-bg: #ffffff;
+    --accent-red: #b52525;
+    --text-dark: #333333;
+    --text-gray: #6c757d;
+    --border-color: #dee2e6;
+}
+
+body {
+    background-color: var(--main-bg);
+    color: var(--text-dark);
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding-bottom: 30px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+}
+
+.sidebar-brand {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ecf0f1;
+    text-decoration: none;
+}
+
+.nav-section-title {
+    font-size: 0.75rem;
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0 10px 10px;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+    .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: var(--text-gray);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: 0.3s;
+        margin-bottom: 5px;
+    }
+
+        .sidebar-nav li a:hover, .sidebar-nav li a.active {
+            background-color: var(--accent-red);
+            color: white;
+        }
+
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 40px;
+}
+
+.custom-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.form-label {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.form-control, .form-select {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 8px;
+}
+
+    .form-control:focus {
+        background-color: #333;
+        border-color: var(--accent-red);
+        color: white;
+        box-shadow: none;
+    }
+
+.btn-primary {
+    background-color: var(--accent-red);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.availability-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    gap: 2px;
+    background-color: #333;
+    border: 1px solid #333;
+}
+
+.grid-cell {
+    background-color: var(--card-bg);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+    .grid-cell.not-available {
+        background-color: rgba(181, 37, 37, 0.2);
+        border: 1px solid var(--accent-red);
+    }

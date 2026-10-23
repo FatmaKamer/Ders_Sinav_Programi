@@ -1,0 +1,84 @@
+﻿@model List<Ders_Sinav_Programi.Models.DersProgramiGorunumModel>
+
+@{
+    ViewData["Title"] = "Haftalık Ders Programı";
+    <div class="mb-3">
+        <label class="text-light fw-bold me-2">Sınıf Seçin:</label>
+        <select id="ddlSinifDuzeyi" class="form-select bg-dark text-light border-secondary d-inline-block" style="width: 200px;" onchange="sinifDegistir()">
+            <option value="1" selected="@(ViewBag.SinifDuzeyiId == 1)">1. Sınıf</option>
+            <option value="2" selected="@(ViewBag.SinifDuzeyiId == 2)">2. Sınıf</option>
+            <option value="3" selected="@(ViewBag.SinifDuzeyiId == 3)">3. Sınıf</option>
+            <option value="4" selected="@(ViewBag.SinifDuzeyiId == 4)">4. Sınıf</option>
+        </select>
+    </div>
+
+    string[] gunler = { "", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma" };
+
+    string[] saatler = { "", "08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00" };
+}
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-inline-block">
+                <h2 class="text-light fw-bold mb-2">Haftalık Ders Programı</h2>
+                <div style="height: 3px; width: 100%; background-color: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow-lg" style="border-radius: 12px; border: 1px solid #444; background-color: #2a2424;">
+        <table class="table table-bordered border-secondary text-center align-middle m-0" style="color: #eee; table-layout: fixed;">
+            <thead>
+                <tr style="background-color: #333; color: white;">
+                    <th style="width: 100px;">Saat</th>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <th>@gunler[i]</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int saat = 1; saat <= 8; saat++)
+                {
+                    <tr>
+                        <td class="fw-bold" style="background-color: rgba(255,255,255,0.05);">@saatler[saat]</td>
+
+                        @for (int gun = 1; gun <= 5; gun++)
+                        {
+                            var dersler = Model.Where(x => x.Gun == gun && x.Saat == saat).ToList();
+
+                            <td style="height: 80px; padding: 5px; vertical-align: top;">
+                                @if (dersler.Any())
+                                {
+                                    foreach (var ders in dersler)
+                                    {
+                                        <div class="p-2 mb-1 rounded" style="background-color: rgba(181, 37, 37, 0.15); border-left: 3px solid var(--accent-red); text-align: left;">
+                                            <div class="fw-bold" style="font-size: 0.85rem; color: #ff6b6b;">@ders.DersKodu</div>
+                                            <div style="font-size: 0.75rem; color: #ccc;">@ders.DersAdi</div>
+                                            <div style="font-size: 0.7rem; color: #aaa;"><i class="bi bi-person-fill"></i> @ders.HocaAdi</div> <!-- YENİ -->
+                                            <div style="font-size: 0.7rem; color: #888;"><i class="bi bi-geo-alt-fill"></i> @ders.SinifAdi</div>
+                                        </div>
+                                    }
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Generate" class="btn btn-outline-light">Geri Dön</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function sinifDegistir() {
+            var secilenSinif = document.getElementById("ddlSinifDuzeyi").value;
+            window.location.href = `/Schedule/ViewSchedule?bolumId=@ViewBag.BolumId&donemId=@ViewBag.DonemId&sinifDuzeyiId=` + secilenSinif;
+        }
+    </script>
+}
